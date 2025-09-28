@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CSRF Attack Test</title>
+</head>
+<body>
+    <h1>CSRF Attack Simulation</h1>
+    <p>Trang này mô phỏng một trang web độc hại cố gắng thực hiện CSRF attack</p>
+    
+    <h2>Test 1: Form không có CSRF token</h2>
+    <form action="http://localhost:8000/delete_user.php?id=1" method="POST">
+        <p>Form này không có CSRF token - sẽ bị chặn</p>
+        <button type="submit">Delete User (CSRF Attack)</button>
+    </form>
+    
+    <h2>Test 2: Form với token giả</h2>
+    <form action="http://localhost:8000/delete_user.php?id=1" method="POST">
+        <input type="hidden" name="csrf_token" value="fake_token_123">
+        <p>Form này có token giả - sẽ bị chặn</p>
+        <button type="submit">Delete User (Fake Token)</button>
+    </form>
+    
+    <h2>Test 3: AJAX Request không có token</h2>
+    <button onclick="ajaxAttack()">AJAX CSRF Attack</button>
+    <div id="result"></div>
+    
+    <script>
+    function ajaxAttack() {
+        fetch('http://localhost:8000/delete_user.php?id=1', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'fake_data=1'
+        })
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('result').innerHTML = '<p>Response: ' + data + '</p>';
+        })
+        .catch(error => {
+            document.getElementById('result').innerHTML = '<p>Error: ' + error + '</p>';
+        });
+    }
+    </script>
+</body>
+</html>
